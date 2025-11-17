@@ -12,7 +12,7 @@ class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameRefere
     required super.size
   }) : super(
     current: TrollState.idle,
-    anchor: Anchor.center,
+    anchor: Anchor(0.5, (384 / 2 + 80) / 384),
   );
 
   @override

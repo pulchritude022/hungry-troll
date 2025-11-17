@@ -46,6 +46,12 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
     animationTicker?.onComplete = onSpawnComplete;
   }
 
+  @override
+  void update(double dt) {
+    super.update(dt);
+    priority = position.y.toInt();
+  }
+
   void onSpawnComplete() {
     if (current == MeatState.spawn) {
       current = MeatState.idle;

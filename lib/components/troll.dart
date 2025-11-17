@@ -36,6 +36,12 @@ class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameRefere
     };
   }
 
+  @override
+  void update(double dt) {
+    super.update(dt);
+    priority = position.y.toInt();
+  }
+
   void moveTo(Vector2 position) {
     // Remove any existing MoveEffect and TimerComponents to prevent state conflicts
     children.query<MoveEffect>().forEach((effect) => effect.removeFromParent());

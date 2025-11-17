@@ -41,6 +41,8 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
   @override
   void update(double dt) {
     super.update(dt);
+
+    priority = position.y.toInt();
     
     // Check if troll is nearby
     if (troll != null) {

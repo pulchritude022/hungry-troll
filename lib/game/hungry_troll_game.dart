@@ -4,8 +4,63 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import '../components/troll.dart';
 
-void main() {
-  runApp(GameWidget(game: HungryTrollGame()));
+class GameScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          GameWidget(game: HungryTrollGame()),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 100,
+              color: const Color.fromARGB(255, 71, 71, 71),
+              child: Center(
+                child: ButtonWidget(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ButtonWidget extends StatefulWidget {
+  @override
+  _ButtonWidgetState createState() => _ButtonWidgetState();
+}
+
+class _ButtonWidgetState extends State<ButtonWidget> {
+  bool isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() => isPressed = true);
+      },
+      onTapUp: (_) {
+        setState(() => isPressed = false);
+        // Add your button action here
+        print('Button pressed!');
+      },
+      onTapCancel: () {
+        setState(() => isPressed = false);
+      },
+      child: Image.asset(
+        isPressed
+            ? 'assets/images/ui/buttons/button_blue_pressed.png'
+            : 'assets/images/ui/buttons/button_blue.png',
+        width: 64,
+        height: 64,
+      ),
+    );
+  }
 }
 
 
@@ -27,8 +82,6 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    print('Tap down');
-    print('Event: ${event.localPosition}');
     troll.moveTo(event.localPosition);
   }
 }

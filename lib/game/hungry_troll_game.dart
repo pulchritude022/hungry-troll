@@ -83,7 +83,9 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    add(Sheep(position: event.localPosition, size: Vector2(128, 128)));
+    final sheep = Sheep(position: event.localPosition, size: Vector2(128, 128));
+    sheep.troll = troll;
+    add(sheep);
     troll.moveTo(event.localPosition);
   }
 }

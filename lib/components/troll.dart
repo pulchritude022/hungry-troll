@@ -61,7 +61,13 @@ class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameRefere
 
   void onMoveComplete() {
     print('Move complete');
-    current = TrollState.idle;
+    current = TrollState.recovery;
+    add(
+      TimerComponent(
+        period: 2.0,
+        onTick: () => current = TrollState.idle,
+      ),
+    );
   }
 
 }

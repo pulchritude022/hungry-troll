@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import '../components/troll.dart';
 import '../components/sheep.dart';
+import '../components/meat.dart';
 
 class GameScreen extends StatelessWidget {
   @override
@@ -86,6 +87,8 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     final sheep = Sheep(position: event.localPosition, size: Vector2(128, 128));
     sheep.troll = troll;
     add(sheep);
+    //final meat = Meat(position: event.localPosition, size: Vector2(128, 128));
+    //add(meat);
     troll.moveTo(event.localPosition);
   }
 }

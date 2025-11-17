@@ -37,8 +37,9 @@ class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameRefere
   }
 
   void moveTo(Vector2 position) {
-    // Remove any existing MoveEffect
+    // Remove any existing MoveEffect and TimerComponents to prevent state conflicts
     children.query<MoveEffect>().forEach((effect) => effect.removeFromParent());
+    children.query<TimerComponent>().forEach((timer) => timer.removeFromParent());
 
     final distance = position.distanceTo(this.position);
     final duration = distance / 100;

@@ -38,7 +38,11 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     
     final imageIdle = await images.load('free_pack/decorations/sheep/sheep_idle.png');
 
-    resourceBanner = BannerHorizontal(position: Vector2(size.x / 2, 64), size: Vector2(300, 192));
+    resourceBanner = BannerHorizontal(
+      position: Vector2(size.x / 2, 64),
+      size: Vector2(300, 192),
+      text: 'Trolls',
+    );
     add(resourceBanner);
 
     // Create the 9-slice button at 128x128

@@ -1,10 +1,18 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
 
 class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameGame> {
+  final String? text;
+  final double fontSize;
+  final Color textColor;
+
   BannerHorizontal({
     required Vector2 position,
     required Vector2 size,
+    this.text,
+    this.fontSize = 24.0,
+    this.textColor = Colors.white,
   }) : super(
           position: position,
           size: size,
@@ -27,6 +35,23 @@ class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameG
       sprite,
       tileSize: sourceTileSize,
     );
+
+    // Add text component if provided
+    if (text != null) {
+      final textComponent = TextComponent(
+        text: text!,
+        textRenderer: TextPaint(
+          style: TextStyle(
+            color: textColor,
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        anchor: Anchor.center,
+        position: size / 2, // Center of the banner
+      );
+      add(textComponent);
+    }
   }
 }
 

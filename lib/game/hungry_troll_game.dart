@@ -5,43 +5,55 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import '../components/troll.dart';
 import '../components/sheep.dart';
+import '../components/button.dart';
 
 class GameScreen extends StatelessWidget {
   final HungryTrollGame game = HungryTrollGame();
 
+  GameScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Game area - expands to fill available space above button
-        Expanded(
-          child: GameWidget(game: game),
-        ),
-        // Button area - fixed height at bottom
-        Container(
-          height: 100,
-          color: const Color.fromARGB(255, 71, 71, 71),
-          child: Center(
-            child: ButtonWidget(game: game),
-          ),
-        ),
-      ],
-    );
+    return GameWidget(game: game);
   }
 }
 
-class ButtonWidget extends StatefulWidget {
-  final HungryTrollGame game;
-
-  const ButtonWidget({Key? key, required this.game}) : super(key: key);
-
-  @override
-  _ButtonWidgetState createState() => _ButtonWidgetState();
-}
-
-class _ButtonWidgetState extends State<ButtonWidget> {
-  bool isPressed = false;
+class HungryTrollGame extends FlameGame with TapCallbacks {
+  late Troll troll;
+  late Button spawnButton;
   final Random random = Random();
+  
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+
+    final frameSize = Vector2(384, 384);
+    const imageScale = 1.0;
+
+    troll = Troll(position: size / 2, size: frameSize * imageScale);
+    add(troll);
+
+    
+    final imageIdle = await images.load('free_pack/decorations/sheep/sheep_idle.png');
+
+    // Create the 9-slice button at 128x128
+    // Position it at the bottom center of the screen
+    spawnButton = Button(
+      position: Vector2(size.x / 2, size.y - 64), // Bottom center, 64 pixels from bottom
+      size: Vector2(128, 128),
+      onPressed: _onButtonPressed,
+      animation: SpriteAnimation.fromFrameData(imageIdle, SpriteAnimationData.sequenced(amount: 6, stepTime: 1/15, textureSize: Vector2(128, 128), loop: true)),
+    );
+    add(spawnButton);
+  }
+
+  void _onButtonPressed() {
+    final position = _generateRandomPosition();
+    final sheep = Sheep(position: position, size: Vector2(128, 128));
+    sheep.troll = troll;
+    add(sheep);
+    print('Button pressed!');
+  }
 
   Vector2 _generateRandomPosition() {
     const minDistance = 200.0;
@@ -53,61 +65,16 @@ class _ButtonWidgetState extends State<ButtonWidget> {
     
     do {
       position = Vector2(
-        margin + random.nextDouble() * (widget.game.size.x - 2 * margin),
-        margin + random.nextDouble() * (widget.game.size.y - 2 * margin),
+        margin + random.nextDouble() * (size.x - 2 * margin),
+        margin + random.nextDouble() * (size.y - 2 * margin),
       );
       attempts++;
     } while (
-      position.distanceTo(widget.game.troll.position) < minDistance &&
+      position.distanceTo(troll.position) < minDistance &&
       attempts < maxAttempts
     );
     
     return position;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) {
-        setState(() => isPressed = true);
-        final position = _generateRandomPosition();
-        final sheep = Sheep(position: position, size: Vector2(128, 128));
-        sheep.troll = widget.game.troll;
-        widget.game.add(sheep);
-      },
-      onTapUp: (_) {
-        setState(() => isPressed = false);
-        // Add your button action here
-        print('Button pressed!');
-      },
-      onTapCancel: () {
-        setState(() => isPressed = false);
-      },
-      child: Image.asset(
-        isPressed
-            ? 'assets/images/ui/buttons/button_blue_pressed.png'
-            : 'assets/images/ui/buttons/button_blue.png',
-        width: 64,
-        height: 64,
-      ),
-    );
-  }
-}
-
-
-
-class HungryTrollGame extends FlameGame with TapCallbacks {
-  late Troll troll;
-  
-  @override
-  Future<void> onLoad() async {
-    super.onLoad();
-
-    final frameSize = Vector2(384, 384);
-    const imageScale = 1.0;
-
-    troll = Troll(position: Vector2(200,200), size: frameSize*imageScale);
-    add(troll);
   }
 
   @override

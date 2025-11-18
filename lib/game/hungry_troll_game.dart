@@ -64,7 +64,6 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     resourceBanner = BannerHorizontal(
       position: Vector2(size.x / 2, 64),
       size: Vector2(250, 160),
-      text: 'Meat: 0',
     );
     resourceBanner.gameState = gameState;
     add(resourceBanner);

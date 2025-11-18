@@ -1,24 +1,15 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
 import '../state/game_state.dart';
+import 'resource_display.dart';
 
 class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameGame> {
-  final String? text;
-  final double fontSize;
-  final Color textColor;
-  final String fontFamily;
   GameState? gameState;
-  
-  TextComponent? _textComponent;
+  ResourceDisplay? _resourceDisplay;
 
   BannerHorizontal({
     required Vector2 position,
     required Vector2 size,
-    this.text,
-    this.fontSize = 24.0,
-    this.textColor = Colors.deepOrangeAccent,
-    this.fontFamily = 'BearDays',
   }) : super(
           position: position,
           size: size,
@@ -42,37 +33,27 @@ class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameG
       tileSize: sourceTileSize,
     );
 
-    // Add text component if provided
-    if (text != null) {
-      _textComponent = TextComponent(
-        text: text!,
-        textRenderer: TextPaint(
-          style: TextStyle(
-            color: textColor,
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
-            fontFamily: fontFamily,
-          ),
-        ),
-        anchor: Anchor.center,
-        position: size / 2, // Center of the banner
-      );
-      add(_textComponent!);
-    }
+    // Create resource display for meat
+    _resourceDisplay = ResourceDisplay(
+      iconPath: 'resources/resources/m_idle.png',
+      initialCount: 0,
+      position: size / 2,
+    );
+    add(_resourceDisplay!);
     
     // Listen to game state changes
-    gameState?.addListener(_updateText);
+    gameState?.addListener(_updateDisplay);
   }
 
-  void _updateText() {
-    if (_textComponent != null && gameState != null) {
-      _textComponent!.text = 'Meat: ${gameState!.meat}';
+  void _updateDisplay() {
+    if (_resourceDisplay != null && gameState != null) {
+      _resourceDisplay!.updateCount(gameState!.meat);
     }
   }
 
   @override
   void onRemove() {
-    gameState?.removeListener(_updateText);
+    gameState?.removeListener(_updateDisplay);
     super.onRemove();
   }
 }

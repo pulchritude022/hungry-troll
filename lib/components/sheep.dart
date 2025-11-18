@@ -10,7 +10,7 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
   Troll? troll;  // Reference to check distance
   bool isFleeing = false;  // Prevent constant recalculation while already fleeing
   static const fleeDistance = 200.0;
-  static const catchDistance = 100.0;  // Distance at which troll catches sheep
+  static const catchDistance = 120.0;  // Distance at which troll catches sheep
   static const fleeSpeed = 50.0;  // 50% slower than troll's 100 speed
   
   Sheep({

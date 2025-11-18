@@ -1,12 +1,15 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/effects.dart';
+import 'sheep.dart';
 
 enum TrollState { idle, walk, attack, recovery, dead }
 
 
 
 class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameReference<FlameGame> {
+  static const attackDistance = 150.0;
+  
   Troll({
     required super.position,
     required super.size
@@ -40,6 +43,45 @@ class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameRefere
   void update(double dt) {
     super.update(dt);
     priority = position.y.toInt();
+    
+    // Query all sheep in the game
+    final allSheep = game.children.query<Sheep>();
+    
+    // Check if any sheep are within attack distance
+    bool sheepNearby = false;
+    if (allSheep.isNotEmpty) {
+      Sheep closestSheep = allSheep.first;
+      for (final sheep in allSheep) {
+        final distance = position.distanceTo(sheep.position);
+        if (distance < position.distanceTo(closestSheep.position)) {
+          closestSheep = sheep;
+        }
+        if (distance < attackDistance) {
+          sheepNearby = true;
+        }
+      }
+      moveTo(closestSheep.position);
+    }
+    
+    // Check if troll is currently moving
+    final isMoving = children.query<MoveEffect>().isNotEmpty;
+    
+    // Handle state transitions based on sheep proximity and movement
+    if (isMoving) {
+      // While moving, use attack animation if sheep nearby, otherwise walk
+      if (sheepNearby && current != TrollState.attack) {
+        current = TrollState.attack;
+      } else if (!sheepNearby && current != TrollState.walk) {
+        current = TrollState.walk;
+      }
+    } else {
+      // When not moving, use attack if sheep nearby, otherwise keep current state
+      if (sheepNearby && current != TrollState.attack && current != TrollState.recovery) {
+        current = TrollState.attack;
+      } else if (!sheepNearby && current == TrollState.attack) {
+        current = TrollState.idle;
+      }
+    }
   }
 
   void moveTo(Vector2 position) {
@@ -58,8 +100,9 @@ class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameRefere
       // Moving right - face right (normal orientation)
       scale.x = 1;
     }
-    
-    current = TrollState.walk;
+    if (current != TrollState.attack) {
+      current = TrollState.walk;
+    }
     final moveEffect = MoveToEffect(position, EffectController(duration: duration), onComplete: onMoveComplete);
     add(moveEffect);
   }

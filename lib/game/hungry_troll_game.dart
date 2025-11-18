@@ -4,30 +4,25 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import '../components/troll.dart';
 import '../components/sheep.dart';
-import '../components/meat.dart';
 
 class GameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          GameWidget(game: HungryTrollGame()),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 100,
-              color: const Color.fromARGB(255, 71, 71, 71),
-              child: Center(
-                child: ButtonWidget(),
-              ),
-            ),
+    return Column(
+      children: [
+        // Game area - expands to fill available space above button
+        Expanded(
+          child: GameWidget(game: HungryTrollGame()),
+        ),
+        // Button area - fixed height at bottom
+        Container(
+          height: 100,
+          color: const Color.fromARGB(255, 71, 71, 71),
+          child: Center(
+            child: ButtonWidget(),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -4,7 +4,7 @@ import 'package:flame/effects.dart';
 import 'troll.dart';
 import 'meat.dart';
 
-enum SheepState { idle, move, grass }
+enum SheepState { idle, move, grass, bounce }
 
 class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameReference<FlameGame> {
   Troll? troll;  // Reference to check distance
@@ -17,7 +17,7 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
     required super.position,
     required super.size
   }) : super(
-    current: SheepState.idle,
+    current: SheepState.bounce,
     anchor: Anchor.center,
   );
 
@@ -30,12 +30,17 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
     final imageIdle = await game.images.load('free_pack/decorations/sheep/sheep_idle.png');
     final imageMove = await game.images.load('free_pack/decorations/sheep/sheep_move.png');
     final imageGrass = await game.images.load('free_pack/decorations/sheep/sheep_grass.png');
+    final imageBounce = await game.images.load('resources/sheep/happysheep_bouncing.png');
 
     animations = {
       SheepState.idle: SpriteAnimation.fromFrameData(imageIdle, SpriteAnimationData.sequenced(amount: 6, stepTime: 1/frameRate, textureSize: frameSize, loop: true)),
       SheepState.move: SpriteAnimation.fromFrameData(imageMove, SpriteAnimationData.sequenced(amount: 4, stepTime: 1/frameRate, textureSize: frameSize, loop: true)),
       SheepState.grass: SpriteAnimation.fromFrameData(imageGrass, SpriteAnimationData.sequenced(amount: 12, stepTime: 1/frameRate, textureSize: frameSize, loop: true)),
+      SheepState.bounce: SpriteAnimation.fromFrameData(imageBounce, SpriteAnimationData.sequenced(amount: 6, stepTime: 1/frameRate, textureSize: frameSize, loop: false)),
     };
+    
+    // Listen for when bounce animation completes
+    animationTicker?.onComplete = onBounceComplete;
   }
 
   @override
@@ -131,6 +136,14 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
   void onFleeComplete() {
     isFleeing = false;
     current = SheepState.idle;
+  }
+
+  void onBounceComplete() {
+    if (current == SheepState.bounce) {
+      current = SheepState.idle;
+      // Clear the onComplete callback so it doesn't interfere with looping animations
+      animationTicker?.onComplete = null;
+    }
   }
 
 }

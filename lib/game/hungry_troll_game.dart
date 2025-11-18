@@ -6,6 +6,7 @@ import 'package:flame/events.dart';
 import '../components/troll.dart';
 import '../components/sheep.dart';
 import '../components/button.dart';
+import '../components/banner_horizontal.dart';
 
 class GameScreen extends StatelessWidget {
   final HungryTrollGame game = HungryTrollGame();
@@ -21,6 +22,7 @@ class GameScreen extends StatelessWidget {
 class HungryTrollGame extends FlameGame with TapCallbacks {
   late Troll troll;
   late Button spawnButton;
+  late BannerHorizontal resourceBanner;
   final Random random = Random();
   
   @override
@@ -35,6 +37,9 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
 
     
     final imageIdle = await images.load('free_pack/decorations/sheep/sheep_idle.png');
+
+    resourceBanner = BannerHorizontal(position: Vector2(size.x / 2, 64), size: Vector2(300, 192));
+    add(resourceBanner);
 
     // Create the 9-slice button at 128x128
     // Position it at the bottom center of the screen

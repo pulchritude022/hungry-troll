@@ -3,12 +3,15 @@ import 'package:flame/game.dart';
 import 'package:flame/effects.dart';
 import 'troll.dart';
 import 'meat.dart';
+import '../state/game_state.dart';
 
 enum SheepState { idle, move, grass, bounce }
 
 class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameReference<FlameGame> {
   Troll? troll;  // Reference to check distance
+  GameState? gameState;  // Reference to update sheep count
   bool isFleeing = false;  // Prevent constant recalculation while already fleeing
+  bool _isCaught = false;  // Prevent multiple meat spawns from same sheep
   static const fleeDistance = 200.0;
   static const catchDistance = 120.0;  // Distance at which troll catches sheep
   static const fleeSpeed = 50.0;  // 50% slower than troll's 100 speed
@@ -54,11 +57,14 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
       final distanceToTroll = position.distanceTo(troll!.position);
       
       // If troll is within catch distance, sheep disappears (gets eaten)
-      if (distanceToTroll < catchDistance) {
+      if (distanceToTroll < catchDistance && !_isCaught) {
+        _isCaught = true;
         // Spawn meat at sheep's position before removing sheep
         final meat = Meat(position: position.clone(), size: Vector2(128, 128));
         meat.troll = troll;
+        meat.gameState = gameState;
         game.add(meat);
+        gameState?.decrementSheep();
         removeFromParent();
         return;
       }

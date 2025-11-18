@@ -3,12 +3,16 @@ import 'package:flame/game.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 import 'troll.dart';
+import '../state/game_state.dart';
 
 enum MeatState { spawn, idle }
 
 class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReference<FlameGame> {
   Troll? troll;  // Reference to check distance
+  GameState? gameState;  // Reference to update currency when consumed
   static const pickupDistance = 80.0;  // Distance at which troll picks up meat
+  bool _isConsumed = false;  // Flag to prevent double consumption
+  TimerComponent? _autoConsumeTimer;  // Reference to cancel timer on manual pickup
   Meat({
     required super.position,
     required super.size
@@ -61,7 +65,7 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
 
   void checkConsumed() {
     // Check if troll is nearby and we're not already flying to it
-    if (troll != null && children.query<MoveEffect>().isEmpty) {
+    if (!_isConsumed && troll != null && children.query<MoveEffect>().isEmpty) {
       final distanceToTroll = position.distanceTo(troll!.position);
       
       // If troll is within catch distance, sheep disappears (gets eaten)
@@ -72,11 +76,19 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
   }
 
   void consume() {
+    if (_isConsumed) return;  // Prevent double consumption
+    _isConsumed = true;
+    
+    // Cancel the auto-consume timer if it exists
+    _autoConsumeTimer?.removeFromParent();
+    _autoConsumeTimer = null;
+    
     final moveEffect = MoveToEffect(troll!.position, EffectController(duration: 0.5, curve: Curves.easeInBack), onComplete: onMoveComplete);
     add(moveEffect);
   }
 
   void onMoveComplete() {
+    gameState?.addMeat(1);
     removeFromParent();
   }
 
@@ -87,13 +99,13 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
       animationTicker?.onComplete = null;
       
       // After 5 seconds in idle state, automatically consume the meat
-      add(
-        TimerComponent(
-          period: 5.0,
-          removeOnFinish: true,
-          onTick: consume,
-        ),
+      // Store reference so we can cancel it if manually picked up
+      _autoConsumeTimer = TimerComponent(
+        period: 5.0,
+        removeOnFinish: true,
+        onTick: consume,
       );
+      add(_autoConsumeTimer!);
     }
   }
 }

@@ -1,18 +1,24 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import '../state/game_state.dart';
 
 class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameGame> {
   final String? text;
   final double fontSize;
   final Color textColor;
+  final String fontFamily;
+  GameState? gameState;
+  
+  TextComponent? _textComponent;
 
   BannerHorizontal({
     required Vector2 position,
     required Vector2 size,
     this.text,
     this.fontSize = 24.0,
-    this.textColor = Colors.white,
+    this.textColor = Colors.deepOrangeAccent,
+    this.fontFamily = 'BearDays',
   }) : super(
           position: position,
           size: size,
@@ -38,20 +44,36 @@ class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameG
 
     // Add text component if provided
     if (text != null) {
-      final textComponent = TextComponent(
+      _textComponent = TextComponent(
         text: text!,
         textRenderer: TextPaint(
           style: TextStyle(
             color: textColor,
             fontSize: fontSize,
             fontWeight: FontWeight.bold,
+            fontFamily: fontFamily,
           ),
         ),
         anchor: Anchor.center,
         position: size / 2, // Center of the banner
       );
-      add(textComponent);
+      add(_textComponent!);
     }
+    
+    // Listen to game state changes
+    gameState?.addListener(_updateText);
+  }
+
+  void _updateText() {
+    if (_textComponent != null && gameState != null) {
+      _textComponent!.text = 'Meat: ${gameState!.meat}';
+    }
+  }
+
+  @override
+  void onRemove() {
+    gameState?.removeListener(_updateText);
+    super.onRemove();
   }
 }
 

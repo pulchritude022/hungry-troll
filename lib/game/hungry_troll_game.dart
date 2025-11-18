@@ -7,11 +7,31 @@ import '../components/troll.dart';
 import '../components/sheep.dart';
 import '../components/button.dart';
 import '../components/banner_horizontal.dart';
+import '../state/game_state.dart';
 
-class GameScreen extends StatelessWidget {
-  final HungryTrollGame game = HungryTrollGame();
+class GameScreen extends StatefulWidget {
+  const GameScreen({super.key});
 
-  GameScreen({super.key});
+  @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  late GameState gameState;
+  late HungryTrollGame game;
+
+  @override
+  void initState() {
+    super.initState();
+    gameState = GameState();
+    game = HungryTrollGame(gameState: gameState);
+  }
+
+  @override
+  void dispose() {
+    gameState.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +40,13 @@ class GameScreen extends StatelessWidget {
 }
 
 class HungryTrollGame extends FlameGame with TapCallbacks {
+  final GameState gameState;
   late Troll troll;
   late Button spawnButton;
   late BannerHorizontal resourceBanner;
   final Random random = Random();
+  
+  HungryTrollGame({GameState? gameState}) : gameState = gameState ?? GameState();
   
   @override
   Future<void> onLoad() async {
@@ -40,9 +63,10 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
 
     resourceBanner = BannerHorizontal(
       position: Vector2(size.x / 2, 64),
-      size: Vector2(300, 192),
-      text: 'Trolls',
+      size: Vector2(250, 160),
+      text: 'Meat: 0',
     );
+    resourceBanner.gameState = gameState;
     add(resourceBanner);
 
     // Create the 9-slice button at 128x128
@@ -60,6 +84,8 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     final position = _generateRandomPosition();
     final sheep = Sheep(position: position, size: Vector2(128, 128));
     sheep.troll = troll;
+    sheep.gameState = gameState;
+    gameState.incrementSheep();
     add(sheep);
     print('Button pressed!');
   }

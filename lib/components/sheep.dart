@@ -52,6 +52,7 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
       if (distanceToTroll < catchDistance) {
         // Spawn meat at sheep's position before removing sheep
         final meat = Meat(position: position.clone(), size: Vector2(128, 128));
+        meat.troll = troll;
         game.add(meat);
         removeFromParent();
         return;

@@ -1,9 +1,14 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/effects.dart';
+import 'package:flutter/animation.dart';
+import 'troll.dart';
 
 enum MeatState { spawn, idle }
 
 class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReference<FlameGame> {
+  Troll? troll;  // Reference to check distance
+  static const pickupDistance = 80.0;  // Distance at which troll picks up meat
   Meat({
     required super.position,
     required super.size
@@ -26,7 +31,7 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
         imageSpawn, 
         SpriteAnimationData.sequenced(
           amount: 7, 
-          stepTime: 1/frameRate, 
+          stepTime: 1/frameRate,
           textureSize: frameSize, 
           loop: false
         ),
@@ -50,6 +55,29 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
   void update(double dt) {
     super.update(dt);
     priority = position.y.toInt();
+
+    checkConsumed();
+  }
+
+  void checkConsumed() {
+    // Check if troll is nearby and we're not already flying to it
+    if (troll != null && children.query<MoveEffect>().isEmpty) {
+      final distanceToTroll = position.distanceTo(troll!.position);
+      
+      // If troll is within catch distance, sheep disappears (gets eaten)
+      if (distanceToTroll < pickupDistance) {
+        consume();
+      }
+    }
+  }
+
+  void consume() {
+    final moveEffect = MoveToEffect(troll!.position, EffectController(duration: 0.5, curve: Curves.easeInBack), onComplete: onMoveComplete);
+    add(moveEffect);
+  }
+
+  void onMoveComplete() {
+    removeFromParent();
   }
 
   void onSpawnComplete() {
@@ -57,6 +85,15 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
       current = MeatState.idle;
       // Set up the idle animation ticker
       animationTicker?.onComplete = null;
+      
+      // After 5 seconds in idle state, automatically consume the meat
+      add(
+        TimerComponent(
+          period: 5.0,
+          removeOnFinish: true,
+          onTick: consume,
+        ),
+      );
     }
   }
 }

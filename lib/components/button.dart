@@ -29,6 +29,8 @@ class Button extends NineTileBoxComponent
   Future<void> onLoad() async {
     await super.onLoad();
 
+    priority = 10000;
+
     Sprite? spriteNormal;
     Sprite? spritePressed;
 

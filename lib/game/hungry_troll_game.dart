@@ -4,14 +4,15 @@ import 'package:flame/game.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import '../components/troll.dart';
-import '../components/sheep.dart';
 import '../components/button.dart';
 import '../components/banner_horizontal.dart';
 import '../components/tiled_background.dart';
 import '../components/tree.dart';
 import '../state/game_state.dart';
+import '../services/upgrade_service.dart';
 import '../components/sheep_spawn_button.dart';
-
+import '../components/upgrade_button.dart';
+import '../data/upgrades_data.dart';
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
 
@@ -44,12 +45,15 @@ class _GameScreenState extends State<GameScreen> {
 
 class HungryTrollGame extends FlameGame with TapCallbacks {
   final GameState gameState;
+  late final UpgradeService upgradeService;
   late Troll troll;
   late Button spawnButton;
   late BannerHorizontal resourceBanner;
   final Random random = Random();
   
-  HungryTrollGame({GameState? gameState}) : gameState = gameState ?? GameState();
+  HungryTrollGame({GameState? gameState}) : gameState = gameState ?? GameState() {
+    upgradeService = UpgradeService(this.gameState, this.gameState.upgradeState);
+  }
   
   @override
   Future<void> onLoad() async {
@@ -80,9 +84,28 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     add(resourceBanner);
 
     final sheepSpawnButton = SheepSpawnButton(
-      position: Vector2(size.x / 2, size.y - 96),
+      position: Vector2(size.x / 2, size.y - 100),
     );
     add(sheepSpawnButton);
+
+    // In HungryTrollGame.onLoad or similar
+    final sheepMaxUpgradeButton = UpgradeButton(
+      upgradeId: Upgrades.maxSheepCount,
+      position: Vector2(size.x/2+140, size.y-90),
+    );
+    add(sheepMaxUpgradeButton);
+
+    final sheepPerClickUpgradeButton = UpgradeButton(
+      upgradeId: Upgrades.sheepPerSpawn,
+      position: Vector2(size.x/2-140, size.y-90),
+    );
+    add(sheepPerClickUpgradeButton);
+
+    final meatPerSheepUpgradeButton = UpgradeButton(
+      upgradeId: Upgrades.meatDropAmount,
+      position: Vector2(size.x/2+260, size.y-90),
+    );
+    add(meatPerSheepUpgradeButton);
   }
 
   Vector2 generateRandomPosition() {

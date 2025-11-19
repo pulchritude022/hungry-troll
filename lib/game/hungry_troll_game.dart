@@ -72,9 +72,6 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     troll = Troll(position: size / 2, size: frameSize * imageScale);
     add(troll);
 
-    
-    final imageIdle = await images.load('free_pack/decorations/sheep/sheep_idle.png');
-
     resourceBanner = BannerHorizontal(
       position: Vector2(size.x / 2, 64),
       size: Vector2(250, 160),
@@ -84,7 +81,6 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
 
     final sheepSpawnButton = SheepSpawnButton(
       position: Vector2(size.x / 2, size.y - 96),
-      size: Vector2(192, 192),
     );
     add(sheepSpawnButton);
   }

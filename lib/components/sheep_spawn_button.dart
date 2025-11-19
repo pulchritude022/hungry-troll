@@ -10,9 +10,9 @@ class SheepSpawnButton extends Button {
 
   SheepSpawnButton({
     required super.position,
-    required super.size,
   }) : super(
     buttonType: ButtonType.blue,
+    size: Vector2(150, 170),
   );
 
   @override
@@ -24,7 +24,7 @@ class SheepSpawnButton extends Button {
     final animationComponent = SpriteAnimationComponent(
       animation: sheepAnimation,
       anchor: Anchor.center,
-      position: size / 2,
+      position: Vector2(size.x/2, size.y/2 - 20),
     );
     add(animationComponent);
 
@@ -37,7 +37,7 @@ class SheepSpawnButton extends Button {
           fontFamily: 'BearDays',
         ),
       ),
-      position: Vector2(size.x/2, size.y/2 + 50),
+      position: Vector2(size.x/2, size.y/2 + 20),
       anchor: Anchor.center,
     );
     add(sheepCount);  
@@ -64,7 +64,7 @@ class SheepSpawnButton extends Button {
   }
 
   void _updateDisplay() {
-    sheepCount.text = '${game.gameState.sheepCount} / ${game.gameState.sheepMaxCount}';
+    sheepCount.text = '${game.gameState.sheepCount}/${game.gameState.sheepMaxCount}';
     if (game.gameState.canSpawnSheep()) {
       enable();
     } else {

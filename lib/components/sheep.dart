@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/effects.dart';
+import 'dart:math';
 import 'troll.dart';
 import 'meat.dart';
 import '../state/game_state.dart';
@@ -59,11 +60,23 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
       // If troll is within catch distance, sheep disappears (gets eaten)
       if (distanceToTroll < catchDistance && !_isCaught) {
         _isCaught = true;
-        // Spawn meat at sheep's position before removing sheep
-        final meat = Meat(position: position.clone(), size: Vector2(128, 128));
-        meat.troll = troll;
-        meat.gameState = gameState;
-        game.add(meat);
+        
+        final dropAmount = gameState?.meatDropAmount ?? 1;
+        final random = Random();
+        
+        for (var i = 0; i < dropAmount; i++) {
+          // Random offset within 64x64 area (-32 to +32)
+          final offset = Vector2(
+            (random.nextDouble() - 0.5) * 64,
+            (random.nextDouble() - 0.5) * 64,
+          );
+          
+          final meat = Meat(position: position + offset, size: Vector2(128, 128));
+          meat.troll = troll;
+          meat.gameState = gameState;
+          game.add(meat);
+        }
+
         gameState?.decrementSheep();
         removeFromParent();
         return;

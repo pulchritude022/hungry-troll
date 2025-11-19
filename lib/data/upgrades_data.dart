@@ -34,10 +34,10 @@ class Upgrades {
       description: 'Spawns additional sheep per click.',
       levels: [
         const UpgradeLevel(value: 1.0, cost: []),
-        const UpgradeLevel(value: 2.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 30)]),
-        const UpgradeLevel(value: 3.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 50)]),
-        const UpgradeLevel(value: 4.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 70)]),
-        const UpgradeLevel(value: 5.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 110)]),
+        const UpgradeLevel(value: 2.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 50)]),
+        const UpgradeLevel(value: 3.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 70)]),
+        const UpgradeLevel(value: 4.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 100)]),
+        const UpgradeLevel(value: 5.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 150)]),
         const UpgradeLevel(value: 10.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 250)]),
       ],
     ),
@@ -47,7 +47,7 @@ class Upgrades {
       description: 'Increases the amount of meat dropped by sheep.',
       levels: [
         const UpgradeLevel(value: 1.0, cost: []),
-        const UpgradeLevel(value: 2.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 40)]),
+        const UpgradeLevel(value: 2.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 100)]),
         const UpgradeLevel(value: 3.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 200)]),
         const UpgradeLevel(value: 4.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 500)]),
         const UpgradeLevel(value: 5.0, cost: [UpgradeCost(type: ResourceType.meat, amount: 1000)]),

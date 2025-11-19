@@ -75,11 +75,13 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
         final fleeDirection = (position - troll!.position).normalized();
         final fleeTarget = position + (fleeDirection * fleeDistance);
         
-        // Clamp to game bounds
-        const margin = 128.0;
+        // Clamp to game bounds        
+        const topMargin = 150.0;
+        const bottomMargin = 250.0;
+        const sideMargin = 120.0;
         final clampedTarget = Vector2(
-          fleeTarget.x.clamp(margin, game.size.x - margin),
-          fleeTarget.y.clamp(margin, game.size.y - margin),
+          fleeTarget.x.clamp(sideMargin, game.size.x - sideMargin),
+          fleeTarget.y.clamp(topMargin, game.size.y - bottomMargin),
         );
         
         fleeTo(clampedTarget);

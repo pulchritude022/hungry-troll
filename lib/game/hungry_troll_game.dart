@@ -88,29 +88,31 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     );
     add(sheepSpawnButton);
 
-    // In HungryTrollGame.onLoad or similar
+    // Upgrade Buttons
     final sheepMaxUpgradeButton = UpgradeButton(
       upgradeId: Upgrades.maxSheepCount,
-      position: Vector2(size.x/2+140, size.y-90),
+      position: Vector2(size.x-70, size.y-70),
     );
     add(sheepMaxUpgradeButton);
 
     final sheepPerClickUpgradeButton = UpgradeButton(
       upgradeId: Upgrades.sheepPerSpawn,
-      position: Vector2(size.x/2-140, size.y-90),
+      position: Vector2(size.x-70, size.y-190),
     );
     add(sheepPerClickUpgradeButton);
 
     final meatPerSheepUpgradeButton = UpgradeButton(
       upgradeId: Upgrades.meatDropAmount,
-      position: Vector2(size.x/2+260, size.y-90),
+      position: Vector2(size.x-70, size.y-310),
     );
     add(meatPerSheepUpgradeButton);
   }
 
   Vector2 generateRandomPosition() {
     const minDistance = 200.0;
-    const margin = 128.0; // Keep sheep away from edges (half of sheep size)
+    const topMargin = 150.0;
+    const bottomMargin = 250.0;
+    const sideMargin = 120.0;
     
     Vector2 position;
     int attempts = 0;
@@ -118,8 +120,8 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     
     do {
       position = Vector2(
-        margin + random.nextDouble() * (size.x - 2 * margin),
-        margin + random.nextDouble() * (size.y - 2 * margin),
+        sideMargin + random.nextDouble() * (size.x - 2 * sideMargin),
+        topMargin + random.nextDouble() * (size.y - topMargin - bottomMargin),
       );
       attempts++;
     } while (

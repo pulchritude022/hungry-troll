@@ -15,7 +15,7 @@ class UpgradeButton extends Button {
     required super.position,
   }) : super(
           buttonType: ButtonType.red,
-          size: Vector2(120, 140),
+          size: Vector2(120, 120),
         );
 
   @override

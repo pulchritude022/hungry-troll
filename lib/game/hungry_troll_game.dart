@@ -8,6 +8,7 @@ import '../components/sheep.dart';
 import '../components/button.dart';
 import '../components/banner_horizontal.dart';
 import '../components/tiled_background.dart';
+import '../components/tree.dart';
 import '../state/game_state.dart';
 
 class GameScreen extends StatefulWidget {
@@ -61,6 +62,9 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     );
     add(background);
 
+    // Spawn trees around the edges
+    _spawnTreesAroundEdges();
+
     final frameSize = Vector2(384, 384);
     const imageScale = 1.0;
 
@@ -100,7 +104,7 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
 
   Vector2 _generateRandomPosition() {
     const minDistance = 200.0;
-    const margin = 64.0; // Keep sheep away from edges (half of sheep size)
+    const margin = 128.0; // Keep sheep away from edges (half of sheep size)
     
     Vector2 position;
     int attempts = 0;
@@ -118,6 +122,57 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     );
     
     return position;
+  }
+
+  void _spawnTreesAroundEdges() {
+    const edgeMargin = 64.0; // Trees spawn within 64 pixels of the edge
+    const treeCount = 50; // Total number of trees to spawn
+    
+    final treeTypes = [TreeType.tree1, TreeType.tree2, TreeType.tree3, TreeType.tree4];
+    
+    for (int i = 0; i < treeCount; i++) {
+      // Randomly choose which edge: 0=top, 1=right, 2=bottom, 3=left
+      final edge = random.nextInt(3); // Ignore the bottom for now
+      Vector2 position;
+      
+      switch (edge) {
+        case 0: // Top edge
+          position = Vector2(
+            random.nextDouble() * size.x,
+            random.nextDouble() * edgeMargin + edgeMargin, // Shift the top down by more than the edge margin
+          );
+          break;
+        case 1: // Right edge
+          position = Vector2(
+            size.x - random.nextDouble() * edgeMargin,
+            random.nextDouble() * size.y,
+          );
+          break;
+        case 2: // Left edge
+          position = Vector2(
+            random.nextDouble() * edgeMargin,
+            random.nextDouble() * size.y,
+          );
+          break;
+        case 3: // Bottom edge
+        default:
+          position = Vector2(
+            random.nextDouble() * size.x,
+            size.y - random.nextDouble() * edgeMargin,
+          );
+          break;
+      }
+      
+      // Randomly select a tree type
+      final treeType = treeTypes[random.nextInt(treeTypes.length)];
+      
+      // Create and add the tree
+      final tree = Tree(
+        position: position,
+        treeType: treeType,
+      );
+      add(tree);
+    }
   }
 
   @override

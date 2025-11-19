@@ -20,6 +20,8 @@ class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameG
   Future<void> onLoad() async {
     await super.onLoad();
 
+    priority = 10000;
+
     // Load the banner sprite
     final sprite = await Sprite.load('UI/Banners/Banner_Horizontal.png');
 

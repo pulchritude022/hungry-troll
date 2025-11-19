@@ -75,6 +75,7 @@ flutter:
     - assets/images/free_pack/decorations/rocks/
     - assets/images/free_pack/decorations/bushes/
     - assets/images/free_pack/decorations/water_rocks/
+    - assets/images/free_pack/terrain/
     - assets/images/Resources/Resources/
     - assets/images/Resources/Sheep/
     - assets/images/Resources/Trees/

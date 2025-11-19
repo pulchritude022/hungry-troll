@@ -7,6 +7,7 @@ import '../components/troll.dart';
 import '../components/sheep.dart';
 import '../components/button.dart';
 import '../components/banner_horizontal.dart';
+import '../components/tiled_background.dart';
 import '../state/game_state.dart';
 
 class GameScreen extends StatefulWidget {
@@ -51,6 +52,14 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+
+    // Add tiled background first (renders behind everything)
+    final background = TiledBackground(
+      imagePath: 'free_pack/terrain/tilemap_color1.png',
+      tileSourcePosition: Vector2(64, 64), // Second row, second column (0-indexed)
+      tileSize: Vector2(64, 64),
+    );
+    add(background);
 
     final frameSize = Vector2(384, 384);
     const imageScale = 1.0;

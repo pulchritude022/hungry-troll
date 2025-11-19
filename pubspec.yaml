@@ -61,24 +61,24 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/images/deco/
-    - assets/images/effects/explosion/
-    - assets/images/effects/fire/
+    - assets/images/Deco/
+    - assets/images/Effects/Explosion/
+    - assets/images/Effects/Fire/
     - assets/images/enemy_pack/troll/
-    - assets/images/ui/buttons/
-    - assets/images/ui/banners/
-    - assets/images/ui/icons/
-    - assets/images/ui/pointers/
-    - assets/images/ui/ribbons/
+    - assets/images/UI/Buttons/
+    - assets/images/UI/Banners/
+    - assets/images/UI/Icons/
+    - assets/images/UI/Pointers/
+    - assets/images/UI/Ribbons/
     - assets/images/free_pack/decorations/sheep/
     - assets/images/free_pack/decorations/trees/
     - assets/images/free_pack/decorations/rocks/
     - assets/images/free_pack/decorations/bushes/
     - assets/images/free_pack/decorations/water_rocks/
-    - assets/images/resources/resources/
-    - assets/images/resources/sheep/
-    - assets/images/resources/trees/
-    - assets/images/resources/gold_mine/
+    - assets/images/Resources/Resources/
+    - assets/images/Resources/Sheep/
+    - assets/images/Resources/Trees/
+    - assets/images/Resources/gold_mine/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

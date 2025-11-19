@@ -88,7 +88,9 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
   }
 
   void onMoveComplete() {
-    gameState?.addMeat(1);
+    if (gameState != null) {
+      gameState!.addMeat(gameState!.meatDropAmount);
+    }
     removeFromParent();
   }
 
@@ -109,4 +111,3 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
     }
   }
 }
-

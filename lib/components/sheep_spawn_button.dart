@@ -50,14 +50,26 @@ class SheepSpawnButton extends Button {
   @override
   void onTapUp(TapUpEvent event) {
     super.onTapUp(event);
-    if (game.gameState.canSpawnSheep()) {
-      final position = game.generateRandomPosition();
-      final sheep = Sheep(position: position, size: Vector2(128, 128));
-      sheep.troll = game.troll;
-      sheep.gameState = game.gameState;
-      game.gameState.incrementSheep();
-      game.add(sheep);
-      print('Button pressed!');
+    
+    final spawnCount = game.gameState.sheepPerSpawn;
+
+    int spawned = 0;
+    for (int i = 0; i < spawnCount; i++) {
+      if (game.gameState.canSpawnSheep()) {
+        final position = game.generateRandomPosition();
+        final sheep = Sheep(position: position, size: Vector2(128, 128));
+        sheep.troll = game.troll;
+        sheep.gameState = game.gameState;
+        game.gameState.incrementSheep();
+        game.add(sheep);
+        spawned++;
+      } else {
+        break; // Stop if we hit the limit
+      }
+    }
+    
+    if (spawned > 0) {
+      print('Button pressed! Spawned $spawned sheep.');
     } else {
       print('Cannot spawn sheep!');
     }

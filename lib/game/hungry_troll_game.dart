@@ -10,6 +10,7 @@ import '../components/banner_horizontal.dart';
 import '../components/tiled_background.dart';
 import '../components/tree.dart';
 import '../state/game_state.dart';
+import '../components/sheep_spawn_button.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -81,28 +82,14 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     resourceBanner.gameState = gameState;
     add(resourceBanner);
 
-    // Create the 9-slice button at 128x128
-    // Position it at the bottom center of the screen
-    spawnButton = Button(
-      position: Vector2(size.x / 2, size.y - 64), // Bottom center, 64 pixels from bottom
-      size: Vector2(128, 128),
-      onPressed: _onButtonPressed,
-      animation: SpriteAnimation.fromFrameData(imageIdle, SpriteAnimationData.sequenced(amount: 6, stepTime: 1/15, textureSize: Vector2(128, 128), loop: true)),
+    final sheepSpawnButton = SheepSpawnButton(
+      position: Vector2(size.x / 2, size.y - 96),
+      size: Vector2(192, 192),
     );
-    add(spawnButton);
+    add(sheepSpawnButton);
   }
 
-  void _onButtonPressed() {
-    final position = _generateRandomPosition();
-    final sheep = Sheep(position: position, size: Vector2(128, 128));
-    sheep.troll = troll;
-    sheep.gameState = gameState;
-    gameState.incrementSheep();
-    add(sheep);
-    print('Button pressed!');
-  }
-
-  Vector2 _generateRandomPosition() {
+  Vector2 generateRandomPosition() {
     const minDistance = 200.0;
     const margin = 128.0; // Keep sheep away from edges (half of sheep size)
     

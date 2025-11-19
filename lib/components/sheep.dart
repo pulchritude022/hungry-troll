@@ -30,10 +30,10 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
 
     final frameSize = Vector2(128, 128);
     const frameRate = 15;
-    final imageIdle = await game.images.load('free_pack/decorations/sheep/sheep_idle.png',);
-    final imageMove = await game.images.load('free_pack/decorations/sheep/sheep_move.png',);
-    final imageGrass = await game.images.load('free_pack/decorations/sheep/sheep_grass.png',);
-    final imageBounce = await game.images.load('Resources/Sheep/HappySheep_Bouncing.png',);
+    final imageIdle = await game.images.load('free_pack/decorations/sheep/sheep_idle.png');
+    final imageMove = await game.images.load('free_pack/decorations/sheep/sheep_move.png');
+    final imageGrass = await game.images.load('free_pack/decorations/sheep/sheep_grass.png');
+    final imageBounce = await game.images.load('resources/sheep/happysheep_bouncing.png');
 
     animations = {
       SheepState.idle: SpriteAnimation.fromFrameData(imageIdle, SpriteAnimationData.sequenced(amount: 6, stepTime: 1/frameRate, textureSize: frameSize, loop: true)),

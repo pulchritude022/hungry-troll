@@ -29,8 +29,8 @@ class Button extends NineTileBoxComponent
     await super.onLoad();
 
     // Load both button sprites
-    final spriteNormal = await Sprite.load('UI/Buttons/Button_Blue_9Slides.png',);
-    final spritePressed = await Sprite.load('UI/Buttons/Button_Blue_9Slides_Pressed.png',);
+    final spriteNormal = await Sprite.load('ui/buttons/button_blue_9slides.png');
+    final spritePressed = await Sprite.load('ui/buttons/button_blue_9slides_pressed.png');
 
     // The source image is 192x192, divided into a 3x3 grid
     // Each tile is 64x64 (192 / 3 = 64)

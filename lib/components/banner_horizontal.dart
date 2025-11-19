@@ -23,7 +23,7 @@ class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameG
     priority = 10000;
 
     // Load the banner sprite
-    final sprite = await Sprite.load('UI/Banners/Banner_Horizontal.png');
+    final sprite = await Sprite.load('ui/banners/banner_horizontal.png');
 
     // The source image is 192x192, divided into a 3x3 grid
     // Each tile is 64x64 (192 / 3 = 64)
@@ -37,7 +37,7 @@ class BannerHorizontal extends NineTileBoxComponent with HasGameReference<FlameG
 
     // Create resource display for meat
     _resourceDisplay = ResourceDisplay(
-      iconPath: 'Resources/Resources/M_Idle.png',
+      iconPath: 'resources/resources/m_idle.png',
       initialCount: 0,
       position: size / 2,
     );

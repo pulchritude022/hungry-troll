@@ -27,8 +27,8 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
 
     final frameSize = Vector2(128, 128);
     const frameRate = 15;
-    final imageSpawn = await game.images.load('Resources/Resources/M_Spawn.png',);
-    final imageIdle = await game.images.load('Resources/Resources/M_Idle.png');
+    final imageSpawn = await game.images.load('resources/resources/m_spawn.png');
+    final imageIdle = await game.images.load('resources/resources/m_idle.png');
 
     animations = {
       MeatState.spawn: SpriteAnimation.fromFrameData(

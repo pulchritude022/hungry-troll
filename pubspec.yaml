@@ -75,18 +75,11 @@ flutter:
     - assets/images/free_pack/decorations/rocks/
     - assets/images/free_pack/decorations/bushes/
     - assets/images/free_pack/decorations/water_rocks/
-<<<<<<< HEAD
     - assets/images/free_pack/terrain/
-    - assets/images/Resources/Resources/
-    - assets/images/Resources/Sheep/
-    - assets/images/Resources/Trees/
-    - assets/images/Resources/gold_mine/
-=======
     - assets/images/resources/resources/
     - assets/images/resources/sheep/
     - assets/images/resources/trees/
     - assets/images/resources/gold_mine/
->>>>>>> parent of 0bbc944 (fixed asset ref casing issue)
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

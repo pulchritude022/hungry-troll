@@ -15,7 +15,7 @@ class UpgradeButton extends Button {
     required super.position,
   }) : super(
           buttonType: ButtonType.red,
-          size: Vector2(120, 120),
+          size: Vector2(120, 90),
         );
 
   @override
@@ -34,7 +34,7 @@ class UpgradeButton extends Button {
           fontFamily: 'BearDays',
         ),
       ),
-      position: Vector2(size.x / 2, size.y / 2 - 30),
+      position: Vector2(size.x / 2, size.y / 2 - 18),
       anchor: Anchor.center,
     );
     add(_labelComponent);
@@ -44,8 +44,8 @@ class UpgradeButton extends Button {
       text: '0 -> 0',
       textRenderer: TextPaint(
         style: const TextStyle(
-          color: Colors.blue,
-          fontSize: 32,
+          color: Colors.white,
+          fontSize: 16,
           fontFamily: 'BearDays',
         ),
       ),
@@ -64,7 +64,7 @@ class UpgradeButton extends Button {
           fontFamily: 'BearDays',
         ),
       ),
-      position: Vector2(size.x / 2, size.y / 2 + 30),
+      position: Vector2(size.x / 2, size.y / 2 + 18),
       anchor: Anchor.center,
     );
     add(_costComponent);
@@ -104,7 +104,7 @@ class UpgradeButton extends Button {
       _costComponent.textRenderer = TextPaint(
         style: const TextStyle(
           color: Colors.grey,
-          fontSize: 20,
+          fontSize: 16,
           fontFamily: 'BearDays',
         ),
       );

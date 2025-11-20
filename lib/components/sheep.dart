@@ -13,8 +13,8 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
   GameState? gameState;  // Reference to update sheep count
   bool isFleeing = false;  // Prevent constant recalculation while already fleeing
   bool _isCaught = false;  // Prevent multiple meat spawns from same sheep
-  static const fleeDistance = 200.0;
-  static const catchDistance = 120.0;  // Distance at which troll catches sheep
+  static const fleeDistance = 160.0;
+  static const catchDistance = 80.0;  // Distance at which troll catches sheep
   static const fleeSpeed = 50.0;  // 50% slower than troll's 100 speed
   
   Sheep({

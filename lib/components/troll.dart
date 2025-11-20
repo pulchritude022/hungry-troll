@@ -8,7 +8,7 @@ enum TrollState { idle, walk, attack, recovery, dead }
 
 
 class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameReference<FlameGame> {
-  static const attackDistance = 150.0;
+  static const attackDistance = 120.0;
   
   Troll({
     required super.position,

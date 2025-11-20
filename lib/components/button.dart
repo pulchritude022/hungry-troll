@@ -75,13 +75,17 @@ class Button extends NineTileBoxComponent
   }
 
   void disable() {
-    isDisabled = true;
-    nineTileBox = _nineTileBoxDisabled;
+    if (!isDisabled) {
+      isDisabled = true;
+      nineTileBox = _nineTileBoxDisabled;
+    }
   }
 
   void enable() {
-    isDisabled = false;
-    nineTileBox = _nineTileBoxNormal;
+    if (isDisabled) {
+      isDisabled = false;
+      nineTileBox = _nineTileBoxNormal;
+    }
   }
 
   @override

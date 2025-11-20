@@ -11,7 +11,7 @@ class Upgrades {
   static final List<UpgradeDefinition> all = [
     UpgradeDefinition(
       id: maxSheepCount,
-      name: 'Max Sheep',
+      name: 'Max',
       description: 'Increases the maximum number of sheep allowed at once.',
       levels: [
         const UpgradeLevel(value: 1.0, cost: []),

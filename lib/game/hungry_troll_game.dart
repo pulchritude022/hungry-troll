@@ -84,32 +84,32 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     add(resourceBanner);
 
     final sheepSpawnButton = SheepSpawnButton(
-      position: Vector2(size.x / 2, size.y - 90),
+      position: Vector2(size.x / 2, size.y - 80),
     );
     add(sheepSpawnButton);
 
     // Upgrade Buttons
     final sheepMaxUpgradeButton = UpgradeButton(
       upgradeId: Upgrades.maxSheepCount,
-      position: Vector2(size.x-70, size.y-70),
+      position: Vector2(size.x-60, size.y-65),
     );
     add(sheepMaxUpgradeButton);
 
     final sheepPerClickUpgradeButton = UpgradeButton(
       upgradeId: Upgrades.sheepPerSpawn,
-      position: Vector2(size.x-70, size.y-190),
+      position: Vector2(size.x-60, size.y-155),
     );
     add(sheepPerClickUpgradeButton);
 
     final meatPerSheepUpgradeButton = UpgradeButton(
       upgradeId: Upgrades.meatDropAmount,
-      position: Vector2(size.x-70, size.y-310),
+      position: Vector2(size.x-60, size.y-245),
     );
     add(meatPerSheepUpgradeButton);
   }
 
   Vector2 generateRandomPosition() {
-    const minDistance = 200.0;
+    const minDistance = 150.0;
     const topMargin = 150.0;
     const bottomMargin = 250.0;
     const sideMargin = 120.0;

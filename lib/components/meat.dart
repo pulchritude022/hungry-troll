@@ -83,7 +83,7 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
     _autoConsumeTimer?.removeFromParent();
     _autoConsumeTimer = null;
     
-    final moveEffect = MoveToEffect(troll!.position, EffectController(duration: 0.5, curve: Curves.easeInBack), onComplete: onMoveComplete);
+    final moveEffect = MoveToEffect(troll!.position + Vector2(0, -100), EffectController(duration: 0.5, curve: Curves.easeInBack), onComplete: onMoveComplete);
     add(moveEffect);
   }
 

@@ -12,19 +12,21 @@ class SheepSpawnButton extends Button {
     required super.position,
   }) : super(
     buttonType: ButtonType.blue,
-    size: Vector2(160, 160),
+    size: Vector2(120, 120),
   );
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     final imageIdle = await game.images.load('free_pack/decorations/sheep/sheep_idle.png');
-    final sheepAnimation = SpriteAnimation.fromFrameData(imageIdle, SpriteAnimationData.sequenced(amount: 6, stepTime: 1/15, textureSize: Vector2(128, 128), loop: true));
+    final textureSize = Vector2(128, 128);
+    final sheepAnimation = SpriteAnimation.fromFrameData(imageIdle, SpriteAnimationData.sequenced(amount: 6, stepTime: 1/15, textureSize: textureSize, loop: true));
     
     final animationComponent = SpriteAnimationComponent(
       animation: sheepAnimation,
       anchor: Anchor.center,
       position: Vector2(size.x/2, size.y/2 - 20),
+      size: textureSize * 0.75,
     );
     add(animationComponent);
 
@@ -33,7 +35,7 @@ class SheepSpawnButton extends Button {
       textRenderer: TextPaint(
         style: TextStyle(
           color: Colors.white,
-          fontSize: 32,
+          fontSize: 24,
           fontFamily: 'BearDays',
         ),
       ),

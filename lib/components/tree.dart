@@ -56,12 +56,7 @@ class Tree extends SpriteAnimationComponent with HasGameReference<FlameGame> {
     
     // Set component size to match texture size
     size = textureSize;
-  }
 
-  @override
-  void update(double dt) {
-    super.update(dt);
-    // Set priority based on Y position for proper layering
     priority = position.y.toInt();
   }
 }

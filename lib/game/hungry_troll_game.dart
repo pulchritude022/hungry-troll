@@ -117,19 +117,23 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     );
     add(meatPerSheepUpgradeButton);
 
+    performanceDisplay = PerformanceDisplay()..position = Vector2(10, 30);
     if (kDebugMode) {
       // Add performance display
-      performanceDisplay = PerformanceDisplay()..position = Vector2(10, 30);
       add(performanceDisplay);
     }
   }
 
   @override
   void update(double dt) {
-    final stopwatch = Stopwatch()..start();
-    super.update(dt);
-    stopwatch.stop();
-    performanceDisplay.recordUpdateTime(stopwatch.elapsedMicroseconds);
+    if (kDebugMode) {
+      final stopwatch = Stopwatch()..start();
+      super.update(dt);
+      stopwatch.stop();
+      performanceDisplay.recordUpdateTime(stopwatch.elapsedMicroseconds);
+    } else {
+      super.update(dt);
+    }
   }
 
   /// Check if the position is within the spawn circle AND actually on the screen
@@ -154,7 +158,7 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
 
   Vector2 generateSpawnPosition() {
     Vector2 position;
-    const minTrollDistance = 200.0;
+    const minTrollDistance = 150.0;
     int attempts = 0;
     const maxAttempts = 100;
 
@@ -171,13 +175,13 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
   }
 
   void _spawnTrees() {
-    const gridSize = 48.0;
-    const variation = 32.0;
+    const gridSize = 72.0;
+    const variation = 48.0;
     const extraBottomMargin = 150.0;
     final treeTypes = [TreeType.tree1, TreeType.tree2, TreeType.tree3, TreeType.tree4];
     
-    for (double x = -gridSize*3; x < size.x + gridSize*3; x += gridSize) {
-      for (double y = -gridSize*3; y < size.y + gridSize*3; y += gridSize) {
+    for (double x = -gridSize*2; x < size.x + gridSize*2; x += gridSize) {
+      for (double y = -gridSize*2; y < size.y + gridSize*2; y += gridSize) {
         final position = Vector2(
           x + random.nextDouble() * variation,
           y + random.nextDouble() * variation,

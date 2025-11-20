@@ -58,8 +58,10 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
   @override
   void update(double dt) {
     super.update(dt);
+    if (_isConsumed) {
+      return;
+    }
     priority = position.y.toInt();
-
     checkConsumed();
   }
 
@@ -78,6 +80,8 @@ class Meat extends SpriteAnimationGroupComponent<MeatState> with HasGameReferenc
   void consume() {
     if (_isConsumed) return;  // Prevent double consumption
     _isConsumed = true;
+
+    priority = 5000;
     
     // Cancel the auto-consume timer if it exists
     _autoConsumeTimer?.removeFromParent();

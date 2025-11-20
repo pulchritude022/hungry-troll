@@ -1,14 +1,14 @@
 import 'package:flame/components.dart';
-import 'package:flame/game.dart';
 import 'package:flame/effects.dart';
 import 'dart:math';
 import 'troll.dart';
 import 'meat.dart';
 import '../state/game_state.dart';
+import '../game/hungry_troll_game.dart';
 
 enum SheepState { idle, move, grass, bounce }
 
-class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameReference<FlameGame> {
+class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameReference<HungryTrollGame> {
   Troll? troll;  // Reference to check distance
   GameState? gameState;  // Reference to update sheep count
   bool isFleeing = false;  // Prevent constant recalculation while already fleeing
@@ -16,6 +16,7 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
   static const fleeDistance = 160.0;
   static const catchDistance = 80.0;  // Distance at which troll catches sheep
   static const fleeSpeed = 50.0;  // 50% slower than troll's 100 speed
+  static const fleeAmount = 40.0;
   
   Sheep({
     required super.position,
@@ -86,18 +87,13 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
       if (distanceToTroll < fleeDistance && !isFleeing) {
         // Calculate direction away from troll
         final fleeDirection = (position - troll!.position).normalized();
-        final fleeTarget = position + (fleeDirection * fleeDistance);
+        final fleeTarget = position + (fleeDirection * fleeAmount);
         
-        // Clamp to game bounds        
-        const topMargin = 150.0;
-        const bottomMargin = 250.0;
-        const sideMargin = 120.0;
-        final clampedTarget = Vector2(
-          fleeTarget.x.clamp(sideMargin, game.size.x - sideMargin),
-          fleeTarget.y.clamp(topMargin, game.size.y - bottomMargin),
-        );
-        
-        fleeTo(clampedTarget);
+        if (game.isWithinSpawnArea(fleeTarget)) {
+          fleeTo(fleeTarget);
+        } else {
+          fleeTo(game.generateSpawnPosition());
+        }
       }
     }
   }

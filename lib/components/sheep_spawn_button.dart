@@ -58,7 +58,7 @@ class SheepSpawnButton extends Button {
     int spawned = 0;
     for (int i = 0; i < spawnCount; i++) {
       if (game.gameState.canSpawnSheep()) {
-        final position = game.generateRandomPosition();
+        final position = game.generateSpawnPosition();
         final sheep = Sheep(position: position, size: Vector2(128, 128));
         sheep.troll = game.troll;
         sheep.gameState = game.gameState;

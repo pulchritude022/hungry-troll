@@ -67,8 +67,8 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     );
     add(background);
 
-    // Spawn trees around the edges
-    _spawnTreesAroundEdges();
+    // Spawn trees
+    _spawnTrees();
 
     final frameSize = Vector2(384, 384);
     const imageScale = 1.0;
@@ -108,78 +108,66 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     add(meatPerSheepUpgradeButton);
   }
 
-  Vector2 generateRandomPosition() {
-    const minDistance = 150.0;
-    const topMargin = 150.0;
-    const bottomMargin = 250.0;
-    const sideMargin = 120.0;
-    
+  /// Check if the position is within the spawn circle AND actually on the screen
+  bool isWithinSpawnArea(Vector2 position) {
+    const horizontalInset = 20.0;
+    // Check horizontal clamping
+    if (position.x < horizontalInset || position.x > size.x - horizontalInset) {
+      return false;
+    }
+    return isWithinSpawnCircle(position);
+  }
+
+  /// Check if the position is within a circle drawn at the center of the screen
+  /// Used to exclude trees from spawning in the circle
+  bool isWithinSpawnCircle(Vector2 position) {
+    final center = Vector2(size.x / 2, size.y / 2);
+    final radius = max(0.0, size.y / 2 - 150);
+
+    // Check circle constraint
+    return position.distanceTo(center) <= radius;
+  }
+
+  Vector2 generateSpawnPosition() {
     Vector2 position;
+    const minTrollDistance = 300.0;
     int attempts = 0;
     const maxAttempts = 100;
-    
+
     do {
-      position = Vector2(
-        sideMargin + random.nextDouble() * (size.x - 2 * sideMargin),
-        topMargin + random.nextDouble() * (size.y - topMargin - bottomMargin),
-      );
+      position = Vector2(size.x * random.nextDouble(), size.y * random.nextDouble());
       attempts++;
-    } while (
-      position.distanceTo(troll.position) < minDistance &&
-      attempts < maxAttempts
-    );
+    } while (!isWithinSpawnArea(position) && position.distanceTo(troll.position) > minTrollDistance && attempts < maxAttempts);
+
+    if (attempts >= 10) {
+      print('Failed to generate a valid spawn position after 10 attempts');
+    }
     
     return position;
   }
 
-  void _spawnTreesAroundEdges() {
-    const edgeMargin = 64.0; // Trees spawn within 64 pixels of the edge
-    const treeCount = 50; // Total number of trees to spawn
-    
+  void _spawnTrees() {
+    const gridSize = 48.0;
+    const variation = 32.0;
+    const extraBottomMargin = 150.0;
     final treeTypes = [TreeType.tree1, TreeType.tree2, TreeType.tree3, TreeType.tree4];
     
-    for (int i = 0; i < treeCount; i++) {
-      // Randomly choose which edge: 0=top, 1=right, 2=bottom, 3=left
-      final edge = random.nextInt(3); // Ignore the bottom for now
-      Vector2 position;
-      
-      switch (edge) {
-        case 0: // Top edge
-          position = Vector2(
-            random.nextDouble() * size.x,
-            random.nextDouble() * edgeMargin + edgeMargin, // Shift the top down by more than the edge margin
+    for (double x = -gridSize*3; x < size.x + gridSize*3; x += gridSize) {
+      for (double y = -gridSize*3; y < size.y + gridSize*3; y += gridSize) {
+        final position = Vector2(
+          x + random.nextDouble() * variation,
+          y + random.nextDouble() * variation,
+        );
+        
+        if (!isWithinSpawnCircle(position) && !isWithinSpawnCircle(position - Vector2(0, extraBottomMargin))) {
+          final treeType = treeTypes[random.nextInt(treeTypes.length)];
+          final tree = Tree(
+            position: position,
+            treeType: treeType,
           );
-          break;
-        case 1: // Right edge
-          position = Vector2(
-            size.x - random.nextDouble() * edgeMargin,
-            random.nextDouble() * size.y,
-          );
-          break;
-        case 2: // Left edge
-          position = Vector2(
-            random.nextDouble() * edgeMargin,
-            random.nextDouble() * size.y,
-          );
-          break;
-        case 3: // Bottom edge
-        default:
-          position = Vector2(
-            random.nextDouble() * size.x,
-            size.y - random.nextDouble() * edgeMargin,
-          );
-          break;
+          add(tree);
+        }
       }
-      
-      // Randomly select a tree type
-      final treeType = treeTypes[random.nextInt(treeTypes.length)];
-      
-      // Create and add the tree
-      final tree = Tree(
-        position: position,
-        treeType: treeType,
-      );
-      add(tree);
     }
   }
 

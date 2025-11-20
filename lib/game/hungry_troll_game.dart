@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
-import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import '../components/troll.dart';
 import '../components/button.dart';
@@ -13,6 +12,7 @@ import '../services/upgrade_service.dart';
 import '../components/sheep_spawn_button.dart';
 import '../components/upgrade_button.dart';
 import '../data/upgrades_data.dart';
+
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
 
@@ -84,7 +84,7 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     add(resourceBanner);
 
     final sheepSpawnButton = SheepSpawnButton(
-      position: Vector2(size.x / 2, size.y - 100),
+      position: Vector2(size.x / 2, size.y - 90),
     );
     add(sheepSpawnButton);
 

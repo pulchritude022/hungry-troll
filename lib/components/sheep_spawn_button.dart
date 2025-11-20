@@ -12,7 +12,7 @@ class SheepSpawnButton extends Button {
     required super.position,
   }) : super(
     buttonType: ButtonType.blue,
-    size: Vector2(150, 170),
+    size: Vector2(160, 160),
   );
 
   @override

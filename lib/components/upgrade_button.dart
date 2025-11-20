@@ -97,7 +97,7 @@ class UpgradeButton extends Button {
     final currentValue = definition.getValue(currentLevel);
     final nextValue = definition.getValue(currentLevel + 1);
 
-    _valueComponent.text = '+${nextValue - currentValue}';
+    _valueComponent.text = '+${(nextValue - currentValue).toInt()}';
 
     if (isMaxLevel) {
       _costComponent.text = 'MAX';

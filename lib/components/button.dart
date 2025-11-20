@@ -1,6 +1,5 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flutter/foundation.dart';
 import '../game/hungry_troll_game.dart';
 
 enum ButtonState { normal, pressed }

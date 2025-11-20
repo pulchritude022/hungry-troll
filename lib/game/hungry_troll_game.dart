@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import 'package:flame/events.dart';
@@ -12,6 +13,7 @@ import '../services/upgrade_service.dart';
 import '../components/sheep_spawn_button.dart';
 import '../components/upgrade_button.dart';
 import '../data/upgrades_data.dart';
+import '../components/performance_display.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -49,6 +51,7 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
   late Troll troll;
   late Button spawnButton;
   late BannerHorizontal resourceBanner;
+  late PerformanceDisplay performanceDisplay;
   final Random random = Random();
   
   HungryTrollGame({GameState? gameState}) : gameState = gameState ?? GameState() {
@@ -58,6 +61,13 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+
+    // Debug only: Start with a couple upgrades already purchased
+    if (kDebugMode) {
+      gameState.upgradeState.setUpgradeLevel(Upgrades.maxSheepCount, 11);
+      gameState.upgradeState.setUpgradeLevel(Upgrades.sheepPerSpawn, 5);
+      gameState.upgradeState.setUpgradeLevel(Upgrades.meatDropAmount, 4);
+    }
 
     // Add tiled background first (renders behind everything)
     final background = TiledBackground(
@@ -106,6 +116,20 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
       position: Vector2(size.x-60, size.y-245),
     );
     add(meatPerSheepUpgradeButton);
+
+    if (kDebugMode) {
+      // Add performance display
+      performanceDisplay = PerformanceDisplay()..position = Vector2(10, 30);
+      add(performanceDisplay);
+    }
+  }
+
+  @override
+  void update(double dt) {
+    final stopwatch = Stopwatch()..start();
+    super.update(dt);
+    stopwatch.stop();
+    performanceDisplay.recordUpdateTime(stopwatch.elapsedMicroseconds);
   }
 
   /// Check if the position is within the spawn circle AND actually on the screen
@@ -130,17 +154,17 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
 
   Vector2 generateSpawnPosition() {
     Vector2 position;
-    const minTrollDistance = 300.0;
+    const minTrollDistance = 200.0;
     int attempts = 0;
     const maxAttempts = 100;
 
     do {
       position = Vector2(size.x * random.nextDouble(), size.y * random.nextDouble());
       attempts++;
-    } while (!isWithinSpawnArea(position) && position.distanceTo(troll.position) > minTrollDistance && attempts < maxAttempts);
+    } while ((!isWithinSpawnArea(position) || position.distanceTo(troll.position) <= minTrollDistance) && attempts < maxAttempts);
 
     if (attempts >= 10) {
-      print('Failed to generate a valid spawn position after 10 attempts');
+      print('It took $attempts attempts to generate a valid spawn position');
     }
     
     return position;

@@ -46,6 +46,11 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
     
     // Listen for when bounce animation completes
     animationTicker?.onComplete = onBounceComplete;
+
+    // Randomly flip the sprite
+    if (Random().nextBool()) {
+      scale.x = -1;
+    }
   }
 
   @override

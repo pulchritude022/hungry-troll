@@ -32,10 +32,10 @@ class UpgradeService {
     for (final cost in costs) {
       switch (cost.type) {
         case ResourceType.meat:
-          if (gameState.meat < cost.amount) return false;
+          if (gameState.meat.value < cost.amount) return false;
           break;
         case ResourceType.gold:
-          if (gameState.gold < cost.amount) return false;
+          if (gameState.gold.value < cost.amount) return false;
           break;
       }
     }

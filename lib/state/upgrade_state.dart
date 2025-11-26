@@ -7,9 +7,11 @@ class UpgradeState extends ChangeNotifier {
     return _upgradeLevels[upgradeId] ?? 0;
   }
 
-  void setUpgradeLevel(String upgradeId, int level) {
+  void setUpgradeLevel(String upgradeId, int level, {bool notify = true}) {
     _upgradeLevels[upgradeId] = level;
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   void incrementUpgradeLevel(String upgradeId) {

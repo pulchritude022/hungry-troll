@@ -4,16 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import 'package:flame/events.dart';
 import '../components/troll.dart';
-import '../components/button.dart';
-import '../components/banner_horizontal.dart';
 import '../components/tiled_background.dart';
 import '../components/tree.dart';
 import '../state/game_state.dart';
 import '../services/upgrade_service.dart';
-import '../components/sheep_spawn_button.dart';
-import '../components/upgrade_button.dart';
 import '../data/upgrades_data.dart';
 import '../components/performance_display.dart';
+import '../widgets/game_overlay.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -41,7 +38,12 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GameWidget(game: game);
+    return Stack(
+      children: [
+        GameWidget(game: game),
+        GameOverlay(game: game, gameState: gameState),
+      ],
+    );
   }
 }
 
@@ -49,8 +51,6 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
   final GameState gameState;
   late final UpgradeService upgradeService;
   late Troll troll;
-  late Button spawnButton;
-  late BannerHorizontal resourceBanner;
   late PerformanceDisplay performanceDisplay;
   final Random random = Random();
   
@@ -64,9 +64,10 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
 
     // Debug only: Start with a couple upgrades already purchased
     if (kDebugMode) {
-      gameState.upgradeState.setUpgradeLevel(Upgrades.maxSheepCount, 11);
-      gameState.upgradeState.setUpgradeLevel(Upgrades.sheepPerSpawn, 5);
-      gameState.upgradeState.setUpgradeLevel(Upgrades.meatDropAmount, 4);
+      // Don't trigger notifications during build/load
+      gameState.upgradeState.setUpgradeLevel(Upgrades.maxSheepCount, 7, notify: false);
+      gameState.upgradeState.setUpgradeLevel(Upgrades.sheepPerSpawn, 3, notify: false);
+      gameState.upgradeState.setUpgradeLevel(Upgrades.meatDropAmount, 3, notify: false);
     }
 
     // Add tiled background first (renders behind everything)
@@ -86,36 +87,7 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     troll = Troll(position: size / 2, size: frameSize * imageScale);
     add(troll);
 
-    resourceBanner = BannerHorizontal(
-      position: Vector2(size.x / 2, 64),
-      size: Vector2(250, 160),
-    );
-    resourceBanner.gameState = gameState;
-    add(resourceBanner);
-
-    final sheepSpawnButton = SheepSpawnButton(
-      position: Vector2(size.x / 2, size.y - 80),
-    );
-    add(sheepSpawnButton);
-
-    // Upgrade Buttons
-    final sheepMaxUpgradeButton = UpgradeButton(
-      upgradeId: Upgrades.maxSheepCount,
-      position: Vector2(size.x-60, size.y-65),
-    );
-    add(sheepMaxUpgradeButton);
-
-    final sheepPerClickUpgradeButton = UpgradeButton(
-      upgradeId: Upgrades.sheepPerSpawn,
-      position: Vector2(size.x-60, size.y-155),
-    );
-    add(sheepPerClickUpgradeButton);
-
-    final meatPerSheepUpgradeButton = UpgradeButton(
-      upgradeId: Upgrades.meatDropAmount,
-      position: Vector2(size.x-60, size.y-245),
-    );
-    add(meatPerSheepUpgradeButton);
+    // UI components are now handled by Flutter Overlay
 
     performanceDisplay = PerformanceDisplay()..position = Vector2(10, 30);
     if (kDebugMode) {

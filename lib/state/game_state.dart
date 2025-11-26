@@ -4,9 +4,10 @@ import 'upgrade_state.dart';
 
 /// Game state that tracks currencies and active entities
 class GameState extends ChangeNotifier {
-  int _meat = 0;
-  int _gold = 0;
-  int _sheepCount = 0;
+  final ValueNotifier<int> meat = ValueNotifier<int>(0);
+  final ValueNotifier<int> gold = ValueNotifier<int>(0);
+  final ValueNotifier<int> sheepCount = ValueNotifier<int>(0);
+  
   // _sheepMaxCount is now derived from upgrades
   
   final UpgradeState upgradeState = UpgradeState();
@@ -16,10 +17,6 @@ class GameState extends ChangeNotifier {
     upgradeState.addListener(notifyListeners);
   }
 
-  int get meat => _meat;
-  int get gold => _gold;
-  int get sheepCount => _sheepCount;
-  
   // --- Upgrade Value Getters ---
   
   /// Generic helper to get the current effective value of any upgrade
@@ -37,55 +34,52 @@ class GameState extends ChangeNotifier {
   // -----------------------------
 
   void addMeat(int amount) {
-    _meat += amount;
-    notifyListeners();
+    meat.value += amount;
   }
   
   void spendMeat(int amount) {
-    if (_meat >= amount) {
-      _meat -= amount;
-      notifyListeners();
+    if (meat.value >= amount) {
+      meat.value -= amount;
     }
   }
 
   void addGold(int amount) {
-    _gold += amount;
-    notifyListeners();
+    gold.value += amount;
   }
   
   void spendGold(int amount) {
-    if (_gold >= amount) {
-      _gold -= amount;
-      notifyListeners();
+    if (gold.value >= amount) {
+      gold.value -= amount;
     }
   }
 
   bool canSpawnSheep() {
-    return _sheepCount < sheepMaxCount;
+    return sheepCount.value < sheepMaxCount;
   }
 
   void incrementSheep() {
-    _sheepCount++;
-    notifyListeners();
+    sheepCount.value++;
   }
 
   void decrementSheep() {
-    _sheepCount--;
-    notifyListeners();
+    sheepCount.value--;
   }
 
   @override
   void dispose() {
+    meat.dispose();
+    gold.dispose();
+    sheepCount.dispose();
     upgradeState.removeListener(notifyListeners);
     upgradeState.dispose();
     super.dispose();
   }
 
   void reset() {
-    _meat = 0;
-    _gold = 0;
-    _sheepCount = 0;
+    meat.value = 0;
+    gold.value = 0;
+    sheepCount.value = 0;
     upgradeState.reset();
-    notifyListeners();
+    notifyListeners(); // Keep this one as it affects general state listeners if any
   }
 }

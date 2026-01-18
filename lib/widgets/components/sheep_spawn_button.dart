@@ -81,8 +81,8 @@ class _SheepSpawnButtonState extends State<SheepSpawnButton> {
 
         return NineSliceButton(
           type: ButtonType.blue,
-          width: 120,
-          height: 120,
+          width: 160,
+          height: 160,
           disabled: !canSpawn,
           onTap: canSpawn ? _handleTap : null,
           child: Column(
@@ -90,8 +90,8 @@ class _SheepSpawnButtonState extends State<SheepSpawnButton> {
             children: [
               // Sheep Animation
               SizedBox(
-                width: 64,
-                height: 64,
+                width: 96,
+                height: 96,
                 child: FutureBuilder<SpriteAnimation>(
                   future: _animationFuture,
                   builder: (context, snapshot) {

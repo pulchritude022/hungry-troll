@@ -28,36 +28,42 @@ class ResourceBanner extends StatelessWidget {
           ),
           
           // Content
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10), // Adjust alignment visually
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Meat Count
-                ValueListenableBuilder<int>(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Meat Count - fixed width container with right-aligned text
+              SizedBox(
+                width: 150,
+                child: ValueListenableBuilder<int>(
                   valueListenable: gameState.meat,
                   builder: (context, value, child) {
                     return Text(
                       '$value',
+                      textAlign: TextAlign.right,
                       style: const TextStyle(
                         color: Colors.deepOrangeAccent,
-                        fontSize: 32,
+                        fontSize: 48,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'BearDays',
-                        // Add shadow/outline if needed to match previous style
                       ),
                     );
                   },
                 ),
-                const SizedBox(width: 5),
-                // Icon
-                Image.asset(
+              ),
+              const SizedBox(width: 8),
+              // Icon - FractionalTranslation offsets by a fraction of the child's size
+              // Original Flame anchor was (0.25, 0.625), geometric center is (0.5, 0.5)
+              // Offset = (0.5 - 0.25, 0.5 - 0.625) = (0.25, -0.125)
+              FractionalTranslation(
+                translation: const Offset(0.25, -0.125),
+                child: Image.asset(
                   'assets/images/resources/resources/m_idle.png',
-                  width: 96,
-                  height: 96,
+                  width: 128,
+                  height: 128,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

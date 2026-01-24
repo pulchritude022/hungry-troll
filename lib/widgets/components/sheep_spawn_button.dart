@@ -57,7 +57,8 @@ class _SheepSpawnButtonState extends State<SheepSpawnButton> {
         sheep.gameState = widget.gameState;
         
         widget.gameState.incrementSheep();
-        widget.game.add(sheep);
+        // Add sheep to the game world (not directly to the game)
+        widget.game.gameWorld.add(sheep);
         spawned++;
       } else {
         break;

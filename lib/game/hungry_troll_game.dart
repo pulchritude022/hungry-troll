@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import 'package:flame/events.dart';
+import 'package:flame/components.dart';
 import '../components/troll.dart';
 import '../components/tiled_background.dart';
 import '../components/tree.dart';
@@ -47,28 +48,20 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
-class HungryTrollGame extends FlameGame with TapCallbacks {
-  final GameState gameState;
-  late final UpgradeService upgradeService;
+/// Fixed world size for consistent gameplay regardless of screen resolution.
+/// The game will be letterboxed/pillarboxed to maintain this aspect ratio.
+const double worldWidth = 1200.0;
+const double worldHeight = 1200.0;
+
+/// The game world that contains all gameplay components.
+/// Components added here are rendered in world coordinates (affected by camera).
+class GameWorld extends World with HasGameReference<HungryTrollGame> {
   late Troll troll;
-  late PerformanceDisplay performanceDisplay;
   final Random random = Random();
-  
-  HungryTrollGame({GameState? gameState}) : gameState = gameState ?? GameState() {
-    upgradeService = UpgradeService(this.gameState, this.gameState.upgradeState);
-  }
-  
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
-
-    // Debug only: Start with a couple upgrades already purchased
-    if (kDebugMode) {
-      // Don't trigger notifications during build/load
-      gameState.upgradeState.setUpgradeLevel(Upgrades.maxSheepCount, 7, notify: false);
-      gameState.upgradeState.setUpgradeLevel(Upgrades.sheepPerSpawn, 3, notify: false);
-      gameState.upgradeState.setUpgradeLevel(Upgrades.meatDropAmount, 3, notify: false);
-    }
 
     // Add tiled background first (renders behind everything)
     final background = TiledBackground(
@@ -84,45 +77,28 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     final frameSize = Vector2(384, 384);
     const imageScale = 1.0;
 
-    troll = Troll(position: size / 2, size: frameSize * imageScale);
+    troll = Troll(
+      position: Vector2(worldWidth / 2, worldHeight / 2),
+      size: frameSize * imageScale,
+    );
     add(troll);
-
-    // UI components are now handled by Flutter Overlay
-
-    performanceDisplay = PerformanceDisplay()..position = Vector2(10, 30);
-    if (kDebugMode) {
-      // Add performance display
-      add(performanceDisplay);
-    }
   }
 
-  @override
-  void update(double dt) {
-    if (kDebugMode) {
-      final stopwatch = Stopwatch()..start();
-      super.update(dt);
-      stopwatch.stop();
-      performanceDisplay.recordUpdateTime(stopwatch.elapsedMicroseconds);
-    } else {
-      super.update(dt);
-    }
-  }
-
-  /// Check if the position is within the spawn circle AND actually on the screen
+  /// Check if the position is within the spawn circle AND actually within the world bounds
   bool isWithinSpawnArea(Vector2 position) {
     const horizontalInset = 20.0;
     // Check horizontal clamping
-    if (position.x < horizontalInset || position.x > size.x - horizontalInset) {
+    if (position.x < horizontalInset || position.x > worldWidth - horizontalInset) {
       return false;
     }
     return isWithinSpawnCircle(position);
   }
 
-  /// Check if the position is within a circle drawn at the center of the screen
+  /// Check if the position is within a circle drawn at the center of the world
   /// Used to exclude trees from spawning in the circle
   bool isWithinSpawnCircle(Vector2 position) {
-    final center = Vector2(size.x / 2, size.y / 2);
-    final radius = max(0.0, size.y / 2 - 150);
+    final center = Vector2(worldWidth / 2, worldHeight / 2);
+    final radius = max(0.0, worldHeight / 2 - 150);
 
     // Check circle constraint
     return position.distanceTo(center) <= radius;
@@ -135,7 +111,7 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     const maxAttempts = 100;
 
     do {
-      position = Vector2(size.x * random.nextDouble(), size.y * random.nextDouble());
+      position = Vector2(worldWidth * random.nextDouble(), worldHeight * random.nextDouble());
       attempts++;
     } while ((!isWithinSpawnArea(position) || position.distanceTo(troll.position) <= minTrollDistance) && attempts < maxAttempts);
 
@@ -152,8 +128,8 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     const extraBottomMargin = 150.0;
     final treeTypes = [TreeType.tree1, TreeType.tree2, TreeType.tree3, TreeType.tree4];
     
-    for (double x = -gridSize*2; x < size.x + gridSize*2; x += gridSize) {
-      for (double y = -gridSize*2; y < size.y + gridSize*2; y += gridSize) {
+    for (double x = -gridSize*2; x < worldWidth + gridSize*2; x += gridSize) {
+      for (double y = -gridSize*2; y < worldHeight + gridSize*2; y += gridSize) {
         final position = Vector2(
           x + random.nextDouble() * variation,
           y + random.nextDouble() * variation,
@@ -170,10 +146,82 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
       }
     }
   }
+}
+
+class HungryTrollGame extends FlameGame with TapCallbacks {
+  final GameState gameState;
+  late final UpgradeService upgradeService;
+  late final GameWorld gameWorld;
+  late PerformanceDisplay performanceDisplay;
+  
+  /// Convenience accessor for the troll component
+  Troll get troll => gameWorld.troll;
+  
+  HungryTrollGame({GameState? gameState}) 
+      : gameState = gameState ?? GameState(),
+        super(
+          camera: CameraComponent.withFixedResolution(
+            width: worldWidth,
+            height: worldHeight,
+          ),
+        ) {
+    upgradeService = UpgradeService(this.gameState, this.gameState.upgradeState);
+  }
+  
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+
+    // Debug only: Start with a couple upgrades already purchased
+    if (kDebugMode) {
+      // Don't trigger notifications during build/load
+      gameState.upgradeState.setUpgradeLevel(Upgrades.maxSheepCount, 7, notify: false);
+      gameState.upgradeState.setUpgradeLevel(Upgrades.sheepPerSpawn, 3, notify: false);
+      gameState.upgradeState.setUpgradeLevel(Upgrades.meatDropAmount, 3, notify: false);
+    }
+
+    // Create and set up the game world
+    gameWorld = GameWorld();
+    camera.world = gameWorld;
+    add(gameWorld);
+
+    // Center the camera on the middle of the world
+    camera.viewfinder.position = Vector2(worldWidth / 2, worldHeight / 2);
+
+    // UI components are now handled by Flutter Overlay
+    // PerformanceDisplay is added directly to the game (HUD layer, not affected by camera)
+    performanceDisplay = PerformanceDisplay()..position = Vector2(10, 30);
+    if (kDebugMode) {
+      add(performanceDisplay);
+    }
+  }
+
+  @override
+  void update(double dt) {
+    if (kDebugMode) {
+      final stopwatch = Stopwatch()..start();
+      super.update(dt);
+      stopwatch.stop();
+      performanceDisplay.recordUpdateTime(stopwatch.elapsedMicroseconds);
+    } else {
+      super.update(dt);
+    }
+  }
+
+  /// Check if the position is within the spawn circle AND actually within world bounds
+  bool isWithinSpawnArea(Vector2 position) => gameWorld.isWithinSpawnArea(position);
+
+  /// Check if the position is within a circle drawn at the center of the world
+  bool isWithinSpawnCircle(Vector2 position) => gameWorld.isWithinSpawnCircle(position);
+
+  /// Generate a random spawn position within the spawn area
+  Vector2 generateSpawnPosition() => gameWorld.generateSpawnPosition();
 
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    troll.moveTo(event.localPosition);
+    // Convert viewport coordinates to world coordinates
+    final worldPosition = camera.globalToLocal(event.devicePosition);
+    troll.moveTo(worldPosition);
   }
 }

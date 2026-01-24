@@ -47,8 +47,8 @@ class Troll extends SpriteAnimationGroupComponent<TrollState> with HasGameRefere
     // Check if troll is currently moving
     final isMoving = children.query<MoveEffect>().isNotEmpty;
     
-    // Query all sheep in the game
-    final allSheep = game.children.query<Sheep>();
+    // Query all sheep in the world (sibling components)
+    final allSheep = parent?.children.query<Sheep>() ?? [];
     
     // Check if any sheep are within attack distance
     bool sheepNearby = false;

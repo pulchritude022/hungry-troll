@@ -80,7 +80,8 @@ class Sheep extends SpriteAnimationGroupComponent<SheepState> with HasGameRefere
           final meat = Meat(position: position + offset, size: Vector2(128, 128));
           meat.troll = troll;
           meat.gameState = gameState;
-          game.add(meat);
+          // Add meat to the world (parent) not the game
+          parent?.add(meat);
         }
 
         gameState?.decrementSheep();

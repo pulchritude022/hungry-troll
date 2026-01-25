@@ -172,10 +172,10 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     _updateCameraZoom();
 
     // UI components are now handled by Flutter Overlay
-    // PerformanceDisplay is added directly to the game (HUD layer, not affected by camera)
+    // PerformanceDisplay is added to camera viewport (HUD layer, not affected by world)
     performanceDisplay = PerformanceDisplay()..position = Vector2(10, 30);
     if (kDebugMode) {
-      add(performanceDisplay);
+      camera.viewport.add(performanceDisplay);
     }
   }
 

@@ -5,8 +5,8 @@ import 'package:flame/game.dart';
 import 'package:flame/events.dart';
 import 'package:flame/components.dart';
 import 'package:flame/cache.dart';
-import 'package:flame_tiled/flame_tiled.dart';
 import '../components/troll.dart';
+import '../components/optimized_tiled_map_loader.dart';
 import '../state/game_state.dart';
 import '../services/upgrade_service.dart';
 import '../data/upgrades_data.dart';
@@ -65,21 +65,23 @@ class GameWorld extends World with HasGameReference<HungryTrollGame> {
     super.onLoad();
 
     // Create a custom Images cache with 'tiles/' prefix for tileset images
-    // This tells flame_tiled to look for PNG files in assets/tiles/ instead of assets/images/
     final tilesImages = Images(prefix: 'tiles/');
     
-    // Load the Tiled map (island with water, cliffs, decorations)
-    // Use FilterQuality.none to prevent tile seams (black lines between tiles)
-    final tiledMap = await TiledComponent.load(
-      'ts_round_island_20x20.tmx',
-      Vector2.all(64),
+    // Load the optimized Tiled map - automatically detects animated layers!
+    // Static layers are compiled into single images for performance (no ghost lines)
+    // Animated layers preserve their animations
+    final mapComponents = await OptimizedTiledMapLoader.load(
+      tmxFile: 'ts_round_island_20x20.tmx',
+      tileSize: Vector2.all(64),
       images: tilesImages,
-      layerPaintFactory: (opacity) => Paint()
-        ..color = Color.fromRGBO(255, 255, 255, opacity)
-        ..filterQuality = FilterQuality.none,
     );
-    add(tiledMap);
+    
+    // Add all map layers in correct order
+    for (final component in mapComponents) {
+      add(component);
+    }
 
+    // Create the troll character
     final frameSize = Vector2(384, 384);
     const imageScale = 1.0;
 

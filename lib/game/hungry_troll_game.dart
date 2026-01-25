@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import 'package:flame/events.dart';
 import 'package:flame/components.dart';
+import 'package:flame/cache.dart';
+import 'package:flame_tiled/flame_tiled.dart';
 import '../components/troll.dart';
-import '../components/tiled_background.dart';
-import '../components/tree.dart';
 import '../state/game_state.dart';
 import '../services/upgrade_service.dart';
 import '../data/upgrades_data.dart';
@@ -50,8 +50,9 @@ class _GameScreenState extends State<GameScreen> {
 
 /// Fixed world size for consistent gameplay regardless of screen resolution.
 /// The game will be letterboxed/pillarboxed to maintain this aspect ratio.
-const double worldWidth = 1200.0;
-const double worldHeight = 1200.0;
+/// Size matches the island map viewport (20-tile island diameter + padding)
+const double worldWidth = 1400.0;
+const double worldHeight = 1400.0;
 
 /// The game world that contains all gameplay components.
 /// Components added here are rendered in world coordinates (affected by camera).
@@ -63,45 +64,47 @@ class GameWorld extends World with HasGameReference<HungryTrollGame> {
   Future<void> onLoad() async {
     super.onLoad();
 
-    // Add tiled background first (renders behind everything)
-    final background = TiledBackground(
-      imagePath: 'free_pack/terrain/tilemap_color1.png',
-      tileSourcePosition: Vector2(64, 64), // Second row, second column (0-indexed)
-      tileSize: Vector2(64, 64),
+    // Create a custom Images cache with 'tiles/' prefix for tileset images
+    // This tells flame_tiled to look for PNG files in assets/tiles/ instead of assets/images/
+    final tilesImages = Images(prefix: 'tiles/');
+    
+    // Load the Tiled map (island with water, cliffs, decorations)
+    // Use FilterQuality.none to prevent tile seams (black lines between tiles)
+    final tiledMap = await TiledComponent.load(
+      'ts_round_island_20x20.tmx',
+      Vector2.all(64),
+      images: tilesImages,
+      layerPaintFactory: (opacity) => Paint()
+        ..color = Color.fromRGBO(255, 255, 255, opacity)
+        ..filterQuality = FilterQuality.none,
     );
-    add(background);
-
-    // Spawn trees
-    _spawnTrees();
+    add(tiledMap);
 
     final frameSize = Vector2(384, 384);
     const imageScale = 1.0;
 
     troll = Troll(
-      position: Vector2(worldWidth / 2, worldHeight / 2),
+      position: Vector2(1920, 1920), // Center of the island in map coordinates
       size: frameSize * imageScale,
     );
     add(troll);
   }
 
-  /// Check if the position is within the spawn circle AND actually within the world bounds
+  /// Check if the position is within the circular island spawn area
+  /// Island is 20 tiles (1280px) diameter, centered at (1920, 1920) in map coords
+  /// Spawn area is ~600px radius from center (slightly smaller than island)
   bool isWithinSpawnArea(Vector2 position) {
-    const horizontalInset = 20.0;
-    // Check horizontal clamping
-    if (position.x < horizontalInset || position.x > worldWidth - horizontalInset) {
-      return false;
-    }
     return isWithinSpawnCircle(position);
   }
 
-  /// Check if the position is within a circle drawn at the center of the world
-  /// Used to exclude trees from spawning in the circle
+  /// Check if the position is within the circular island
+  /// Center: (1920, 1920) in map coordinates, Island radius: ~640px, Spawn radius: ~600px
   bool isWithinSpawnCircle(Vector2 position) {
-    final center = Vector2(worldWidth / 2, worldHeight / 2);
-    final radius = max(0.0, worldHeight / 2 - 150);
+    final center = Vector2(1920, 1920); // Center of 60x60 tile map
+    const spawnRadius = 600.0;  // Stay within island boundaries
 
     // Check circle constraint
-    return position.distanceTo(center) <= radius;
+    return position.distanceTo(center) <= spawnRadius;
   }
 
   Vector2 generateSpawnPosition() {
@@ -110,41 +113,23 @@ class GameWorld extends World with HasGameReference<HungryTrollGame> {
     int attempts = 0;
     const maxAttempts = 100;
 
+    // Generate random position within circular island
+    final center = Vector2(1920, 1920); // Center of 60x60 tile map
+    const spawnRadius = 600.0;
+
     do {
-      position = Vector2(worldWidth * random.nextDouble(), worldHeight * random.nextDouble());
+      // Generate random angle and distance for circular distribution
+      final angle = random.nextDouble() * 2 * pi;
+      final distance = random.nextDouble() * spawnRadius;
+      position = center + Vector2(cos(angle) * distance, sin(angle) * distance);
       attempts++;
-    } while ((!isWithinSpawnArea(position) || position.distanceTo(troll.position) <= minTrollDistance) && attempts < maxAttempts);
+    } while ((position.distanceTo(troll.position) <= minTrollDistance) && attempts < maxAttempts);
 
     if (attempts >= 10) {
       print('It took $attempts attempts to generate a valid spawn position');
     }
     
     return position;
-  }
-
-  void _spawnTrees() {
-    const gridSize = 72.0;
-    const variation = 48.0;
-    const extraBottomMargin = 150.0;
-    final treeTypes = [TreeType.tree1, TreeType.tree2, TreeType.tree3, TreeType.tree4];
-    
-    for (double x = -gridSize*2; x < worldWidth + gridSize*2; x += gridSize) {
-      for (double y = -gridSize*2; y < worldHeight + gridSize*2; y += gridSize) {
-        final position = Vector2(
-          x + random.nextDouble() * variation,
-          y + random.nextDouble() * variation,
-        );
-        
-        if (!isWithinSpawnCircle(position) && !isWithinSpawnCircle(position - Vector2(0, extraBottomMargin))) {
-          final treeType = treeTypes[random.nextInt(treeTypes.length)];
-          final tree = Tree(
-            position: position,
-            treeType: treeType,
-          );
-          add(tree);
-        }
-      }
-    }
   }
 }
 
@@ -158,13 +143,7 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
   Troll get troll => gameWorld.troll;
   
   HungryTrollGame({GameState? gameState}) 
-      : gameState = gameState ?? GameState(),
-        super(
-          camera: CameraComponent.withFixedResolution(
-            width: worldWidth,
-            height: worldHeight,
-          ),
-        ) {
+      : gameState = gameState ?? GameState() {
     upgradeService = UpgradeService(this.gameState, this.gameState.upgradeState);
   }
   
@@ -185,8 +164,12 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     camera.world = gameWorld;
     add(gameWorld);
 
-    // Center the camera on the middle of the world
-    camera.viewfinder.position = Vector2(worldWidth / 2, worldHeight / 2);
+    // Center the camera on the island center
+    // Map is 60x60 tiles (3840x3840px), island is centered at (1920, 1920)
+    camera.viewfinder.position = Vector2(1920, 1920);
+    
+    // Set initial zoom to ensure at least 1400 units are visible
+    _updateCameraZoom();
 
     // UI components are now handled by Flutter Overlay
     // PerformanceDisplay is added directly to the game (HUD layer, not affected by camera)
@@ -194,6 +177,26 @@ class HungryTrollGame extends FlameGame with TapCallbacks {
     if (kDebugMode) {
       add(performanceDisplay);
     }
+  }
+
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    _updateCameraZoom();
+  }
+
+  /// Adjusts camera zoom so at least 1500x1500 units are visible,
+  /// while showing more content on wider/taller screens
+  void _updateCameraZoom() {
+    // Calculate zoom to ensure minimum 1500 units visible in smallest dimension
+    final minVisibleSize = 1500.0;
+    
+    // Use the smaller screen dimension to calculate zoom
+    // This ensures the minimum 1400x1400 area is always visible
+    final smallerDimension = size.x < size.y ? size.x : size.y;
+    final zoom = smallerDimension / minVisibleSize;
+    
+    camera.viewfinder.zoom = zoom;
   }
 
   @override
